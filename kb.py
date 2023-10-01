@@ -34,11 +34,18 @@ step_finished = [
     [InlineKeyboardButton(text="О нас", callback_data="info_company",),]
 ]
 
+statistics_menu = [
+    [InlineKeyboardButton(text="За день", callback_data="statistics_day", inline_keyboard_markup=1),],
+    [InlineKeyboardButton(text="За неделю", callback_data="statistics_week",),],
+    [InlineKeyboardButton(text="За месяц", callback_data="statistics_month",),]
+]
+
 step1 = InlineKeyboardMarkup(inline_keyboard=step1)
 step2 = InlineKeyboardMarkup(inline_keyboard=step2)
 step3 = InlineKeyboardMarkup(inline_keyboard=step3)
 step4 = InlineKeyboardMarkup(inline_keyboard=step4)
 step_finished = InlineKeyboardMarkup(inline_keyboard=step_finished)
+statistics_menu = InlineKeyboardMarkup(inline_keyboard=statistics_menu)
 
 # exit_kb = ReplyKeyboardMarkup(keyboard=[[KeyboardButton(text="◀️ Начать сначала")]], resize_keyboard=True)
 iexit_kb = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="◀️ Начать сначала", callback_data="step_to_1")]])

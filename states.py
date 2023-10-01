@@ -7,3 +7,4 @@ class Gen(StatesGroup):
     step_promt2 = State()
     step_promt3 = State()
     step_promt4 = State()
+    static_pass_promt = State()
