@@ -32,46 +32,49 @@ def execute_query(connection, query):
 ###      
 def check_id(user_id, connection):
     cursor = connection.cursor()
-    select_user_id = cursor.execute('SELECT userid FROM "BOTSHEME".infoclickuser')
+    select_user_id = cursor.execute(f'SELECT userid FROM {DB_SHEME}.infoclickuser')
     select_user_id = cursor.fetchall()
-    check_state = True
-    for index, elem in enumerate(select_user_id, start=0):
-        if (user_id in elem):
-            check_state = True
-            break
-        else: 
-            check_state = False
-    return check_state        
+    check_state = False
+    for index, elem in enumerate(select_user_id):
+        if (select_user_id != []):
+            if (user_id in elem):
+                check_state = True
+                break
+            else: 
+                check_state = False
+    return check_state
 ###
 def insert_stroke(user_id, click_to_app, click_to_gift, click_location):
+    DB_CONNECTION = create_connection('bot_db', 'gen_user', 'renpnzlove_58', '217.25.90.205', '5432')
     cursor = DB_CONNECTION.cursor()
     click_date = date.today()
     try:
         if(not check_id(user_id, DB_CONNECTION)):
-            insert_query = ('''INSERT INTO "BOTSHEME".infoclickuser (userid, clicktoapp, clicktobutton, click_date) VALUES (%s, %s, %s, %s)''')
+            insert_query = (f'''INSERT INTO {DB_SHEME}.infoclickuser (userid, clicktoapp, clicktobutton, click_date) VALUES (%s, %s, %s, %s)''')
             insert_tuple = (user_id, click_to_app, click_to_gift, click_date)
             cursor.execute(insert_query, insert_tuple)
             DB_CONNECTION.commit()
         else:
-            select_click_to_app = cursor.execute(f'SELECT clicktoapp FROM "BOTSHEME".infoclickuser WHERE userid = {user_id}')
+            select_click_to_app = cursor.execute(f'SELECT clicktoapp FROM {DB_SHEME}.infoclickuser WHERE userid = {user_id}')
             select_click_to_app = cursor.fetchall()
 
-            select_click_to_gift = cursor.execute(f'SELECT clicktobutton FROM "BOTSHEME".infoclickuser WHERE userid = {user_id}')
+            select_click_to_gift = cursor.execute(f'SELECT clicktobutton FROM {DB_SHEME}.infoclickuser WHERE userid = {user_id}')
             select_click_to_gift = cursor.fetchall()
 
             if(not select_click_to_app[0][0] and click_location == "app"):
-                update_query = (f'UPDATE "BOTSHEME".infoclickuser SET clicktoapp = {True} WHERE userid = {user_id}')
+                update_query = (f'UPDATE {DB_SHEME}.infoclickuser SET clicktoapp = {True} WHERE userid = {user_id}')
                 cursor.execute(update_query)
                 DB_CONNECTION.commit()
 
             if(not select_click_to_gift[0][0] and click_location == "gift"):
-                update_query = (f'UPDATE "BOTSHEME".infoclickuser SET clicktobutton = {True} WHERE userid = {user_id}')
+                update_query = (f'UPDATE {DB_SHEME}.infoclickuser SET clicktobutton = {True} WHERE userid = {user_id}')
                 cursor.execute(update_query)
                 DB_CONNECTION.commit()
     except OperationalError as e:
         print(f"The error '{e}' occurred")
 ###
 def getting_over_date(interval):
+    DB_CONNECTION = create_connection('bot_db', 'gen_user', 'renpnzlove_58', '217.25.90.205', '5432')
     all_click_to_gift = 0
     all_click_to_app = 0
 
@@ -80,7 +83,7 @@ def getting_over_date(interval):
     date_for_get = date_today - interval_timedelta
 
     cursor = DB_CONNECTION.cursor()
-    select_click_date = cursor.execute(f"SELECT * FROM " + '"BOTSHEME".infoclickuser ' + f"WHERE click_date BETWEEN '{date_for_get}' AND '{date_today}'")
+    select_click_date = cursor.execute(f"SELECT * FROM " + f'{DB_SHEME}.infoclickuser ' + f"WHERE click_date BETWEEN '{date_for_get}' AND '{date_today}'")
     select_click_date = cursor.fetchall()
 
     for index, elem in enumerate(select_click_date):
@@ -91,6 +94,7 @@ def getting_over_date(interval):
     
     return all_click_to_app, all_click_to_gift
 ###
-    
+
 DB_CONNECTION = create_connection('BOT_DB', 'admin', '0000', '127.0.0.1', '5432')
-DB_TABLE = execute_query(DB_CONNECTION, f'{DB_SELECT} * FROM "BOTSHEME".infoclickuser')
+DB_SHEME = "bot_sheme"
+# DB_TABLE = execute_query(DB_CONNECTION, f'{DB_SELECT} * FROM {DB_SHEME}.infoclickuser')

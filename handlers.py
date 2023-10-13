@@ -14,18 +14,20 @@ import text
 import utils
 import admin
 
-router = Router()
+# Необходимо добавить возможность отслеживать сколько людей выбрала 
+# те или иные варианты и добавить вывод в процентах: за месяц, за неделю, за всё время и т.д
 
+router = Router()
+###
 @router.message(Command("start"))
 async def start_handler(msg: Message):
     await msg.answer(text.greet.format(name=msg.from_user.full_name), reply_markup=kb.step1)
-
+###
+### Выбор команды по выводу статистики и проверка пароля
 @router.message(Command("statistics"))
 async def statistics_command(msg: Message, state: FSMContext):
     await msg.answer(text.admin_password_message.format(name=msg.from_user.full_name))
     await state.set_state(Gen.static_pass_promt)
-    
-    #Добавить проверку пароля, чтобы обычные пользователи не смогли получить доступ при случае если узнают команду
 @router.message(Gen.static_pass_promt)
 async def statistics_pass(msg: Message, state: FSMContext):
     password = msg.text
@@ -33,7 +35,8 @@ async def statistics_pass(msg: Message, state: FSMContext):
         return await msg.answer(text.statistics_text_question.format(name=msg.from_user.full_name), reply_markup=kb.statistics_menu)
     else: 
         await msg.answer(text.admin_password_error.format(name=msg.from_user.full_name))
-    
+###
+### Выбор за какое количество дней необходимо выводить данные ###
 @router.callback_query(F.data == "statistics_day")
 async def print_statistics_day(clbck: router.callback_query):
     await clbck.message.answer(text.statistics_text_answer + "\n" + f"Людей перешедших в приложение без подарка: {db.getting_over_date(1)[0]}" "\n" 
@@ -46,8 +49,7 @@ async def print_statistics_week(clbck: router.callback_query):
 async def print_statistics_month(clbck: router.callback_query):
     await clbck.message.answer(text.statistics_text_answer + "\n" + f"Людей перешедших в приложение без подарка: {db.getting_over_date(30)[0]}" "\n" 
                                + f"Людей дошедших до получения подарка: {db.getting_over_date(30)[1]}")
-    
-
+###
 @router.callback_query(F.data == "step_to_2")
 async def step_to_2(clbck: router.callback_query, state: FSMContext):
     await clbck.message.answer(text.step_text1, reply_markup=kb.step2)
